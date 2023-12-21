@@ -133,6 +133,6 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 }
 
 func (s *Server) Profile(ctx echo.Context) error {
-	//TODO implement me
-	panic("implement me")
+
+	return nil
 }
