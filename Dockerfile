@@ -17,7 +17,7 @@ FROM alpine:latest
 COPY --from=Build /main .
 
 # This is the port that our application will be listening on.
-EXPOSE 1323
+EXPOSE 1111
 
 # This is the command that will be executed when the container is started.
 ENTRYPOINT ["./main"]

@@ -1,13 +1,23 @@
 services:
-  #  app:
-  #    build: .
-  #    ports:
-  #      - "8080:1323"
-  #    environment:
-  #      DATABASE_URL: postgres://postgres:postgres@db:5432/database?sslmode=disable
-  #    depends_on:
-  #      db:
-  #        condition: service_healthy
+  api:
+    container_name: swpr
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    network_mode: "host"
+    ports:
+      - 1111:1111
+    environment:
+      APP_DB_HOST: localhost
+      APP_DB_PORT: 2345
+      APP_DB_DB: swpr
+      APP_DB_USERNAME: opannapo
+      APP_DB_PASSWORD: opannapo
+      APP_SEC_JWTKEY: Test123TestKeyJwt
+      APP_SEC_JWT_TTL: 24h
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     platform: linux/x86_64
     image: postgres:14.1-alpine

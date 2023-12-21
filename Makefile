@@ -1,4 +1,4 @@
-.PHONY: clean all init generate generate_mocks
+.PHONY: clean all init generate generate_mocks compose-up compose-down
 
 all: build/main
 
@@ -30,3 +30,9 @@ generate_mocks: $(INTERFACES_GEN_GO_FILES)
 $(INTERFACES_GEN_GO_FILES): %.mock.gen.go: %.go
 	@echo "Generating mocks $@ for $<"
 	mockgen -source=$< -destination=$@ -package=$(shell basename $(dir $<))
+
+compose-up:
+	sudo docker-compose up --build -d
+
+compose-down:
+	sudo docker-compose down --volumes
