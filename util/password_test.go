@@ -1,6 +1,9 @@
-package util
+package util_test
 
-import "testing"
+import (
+	"swpr/util"
+	"testing"
+)
 
 func TestCheckPasswordHash(t *testing.T) {
 	type args struct {
@@ -39,7 +42,7 @@ func TestCheckPasswordHash(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CheckPasswordHash(tt.args.password, tt.args.hash); got != tt.want {
+			if got := util.CheckPasswordHash(tt.args.password, tt.args.hash); got != tt.want {
 				t.Errorf("CheckPasswordHash() = %v, want %v", got, tt.want)
 			}
 		})
@@ -65,8 +68,8 @@ func TestHashPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := HashPassword(tt.args.password)
-			actualMatch := CheckPasswordHash(tt.args.password, got)
+			got, _ := util.HashPassword(tt.args.password)
+			actualMatch := util.CheckPasswordHash(tt.args.password, got)
 			if tt.isGeneratedHashValid != actualMatch {
 				t.Errorf("HashPassword() got = %v, want isMatch %v, actualMatch %v", got, tt.isGeneratedHashValid, actualMatch)
 			}

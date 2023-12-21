@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
+	"swpr/config"
 	"swpr/generated"
 	"swpr/repository"
 	"swpr/util"
@@ -114,7 +115,7 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 
 	//Requirement no.3
 	//JWT with algorithm RS256.
-	stringToken, err := util.JwtCreateToken(user.Id)
+	stringToken, err := util.JwtCreateToken(user.Id, config.Instance.Security.JwtSecKey, config.Instance.Security.JwtTTL)
 	if err != nil {
 		log.Println("error ", err)
 		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
