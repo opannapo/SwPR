@@ -23,23 +23,21 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 		return ctx.JSON(http.StatusBadRequest, nil)
 	}
 
-	//validation
+	var errMsgsValidation []interface{}
 
-	isMatch, err := util.ValidatePhoneForRegister(req.Phone)
-	if err != nil {
-		log.Println("error ", err)
-		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
-			Message: []interface{}{
-				err.Error(),
-			},
-		})
+	//validation
+	isPhoneValid := util.ValidatePhoneForRegister(req.Phone)
+	if !isPhoneValid {
+		errMsgsValidation = append(errMsgsValidation, "invalid phone number format")
 	}
-	log.Println("isMatch ", isMatch, req.Phone)
-	if !isMatch {
-		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
-			Message: []interface{}{
-				"invalid phone number format",
-			},
+	isNameValid := util.ValidateNameForRegister(req.FullName)
+	if !isNameValid {
+		errMsgsValidation = append(errMsgsValidation, "invalid fullname. Min.3 Max.60")
+	}
+
+	if len(errMsgsValidation) != 0 {
+		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
+			Message: errMsgsValidation,
 		})
 	}
 

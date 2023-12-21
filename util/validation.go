@@ -12,6 +12,9 @@ func ValidatePhoneForRegister(in string) (isMatch bool) {
 	return
 }
 
-func ValidateNameForRegister(in string) (err error) {
+func ValidateNameForRegister(in string) (isMatch bool) {
+	pattern := `^.{3,60}$`
+	re := regexp.MustCompile(pattern)
+	isMatch = re.MatchString(in)
 	return
 }
