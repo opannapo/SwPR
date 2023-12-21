@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestValidatePhoneForRegister(t *testing.T) {
+func TestValidatePhoneFormat(t *testing.T) {
 	type args struct {
 		phoneNumber string
 	}
@@ -52,14 +52,14 @@ func TestValidatePhoneForRegister(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if actualResult := util.ValidatePhoneForRegister(tt.args.phoneNumber); actualResult != tt.wantResult {
-				t.Errorf("TestValidatePhoneForRegister() = %v, want %v", actualResult, tt.wantResult)
+			if actualResult := util.ValidatePhoneFormat(tt.args.phoneNumber); actualResult != tt.wantResult {
+				t.Errorf("ValidatePhoneFormat() = %v, want %v", actualResult, tt.wantResult)
 			}
 		})
 	}
 }
 
-func TestValidateNameForRegister(t *testing.T) {
+func TestValidateFullNameFormat(t *testing.T) {
 	type args struct {
 		phoneNumber string
 	}
@@ -99,8 +99,55 @@ func TestValidateNameForRegister(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if actualResult := util.ValidateNameForRegister(tt.args.phoneNumber); actualResult != tt.wantResult {
+			if actualResult := util.ValidateFullNameFormat(tt.args.phoneNumber); actualResult != tt.wantResult {
 				t.Errorf("ValidateNameForRegister() = %v, want %v", actualResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func TestValidatePasswordFormat(t *testing.T) {
+	type args struct {
+		phoneNumber string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult bool
+	}{
+		{
+			name: "Success 6 character",
+			args: args{
+				phoneNumber: "123456",
+			},
+			wantResult: true,
+		},
+		{
+			name: "Success 66 character",
+			args: args{
+				phoneNumber: "1234567890123456789012345678901234567890123456789012345678901234",
+			},
+			wantResult: true,
+		},
+		{
+			name: "Error <6 character",
+			args: args{
+				phoneNumber: "12345",
+			},
+			wantResult: false,
+		},
+		{
+			name: "Error >64 character",
+			args: args{
+				phoneNumber: "12345678901234567890123456789012345678901234567890123456789012345",
+			},
+			wantResult: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if actualResult := util.ValidatePasswordFormat(tt.args.phoneNumber); actualResult != tt.wantResult {
+				t.Errorf("ValidatePasswordFormat() = %v, want %v", actualResult, tt.wantResult)
 			}
 		})
 	}
