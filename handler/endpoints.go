@@ -86,7 +86,9 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 		})
 	}
 
-	//Compute param plain password with hash password on user result
+	//Requirement no.3
+	//Compute param plain password with hash password on user result.
+	//Unsuccessful login will return HTTP 400 Bad Requests code.
 	isMatch := util.CheckPasswordHash(req.Password, user.Password)
 	if !isMatch {
 		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
@@ -96,7 +98,12 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 		})
 	}
 
+	//Requirement no.3
+	//JWT with algorithm RS256.
+	stringToken, err := util.JwtCreateToken(user.Id)
+
 	return ctx.JSON(http.StatusOK, generated.LoginResOk{
-		Id: int(user.Id),
+		Id:    int(user.Id),
+		Token: stringToken,
 	})
 }
