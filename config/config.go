@@ -26,6 +26,7 @@ type Database struct {
 
 type Security struct {
 	JwtSecKey string `mapstructure:"APP_SEC_JWTKEY" validate:"required"`
+	JwtTTL    string `mapstructure:"APP_SEC_JWT_TTL" validate:"required"`
 }
 
 func InitConfigInstance() (err error) {
