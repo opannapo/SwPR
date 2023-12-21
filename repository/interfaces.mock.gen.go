@@ -49,6 +49,21 @@ func (mr *MockRepositoryInterfaceMockRecorder) GetTestById(ctx, input interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTestById", reflect.TypeOf((*MockRepositoryInterface)(nil).GetTestById), ctx, input)
 }
 
+// LoginAttemptCreate mocks base method.
+func (m *MockRepositoryInterface) LoginAttemptCreate(ctx context.Context, input LoginAttemptCreate) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginAttemptCreate", ctx, input)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoginAttemptCreate indicates an expected call of LoginAttemptCreate.
+func (mr *MockRepositoryInterfaceMockRecorder) LoginAttemptCreate(ctx, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginAttemptCreate", reflect.TypeOf((*MockRepositoryInterface)(nil).LoginAttemptCreate), ctx, input)
+}
+
 // UserCreate mocks base method.
 func (m *MockRepositoryInterface) UserCreate(ctx context.Context, input UserCreate) (int64, error) {
 	m.ctrl.T.Helper()
@@ -64,17 +79,17 @@ func (mr *MockRepositoryInterfaceMockRecorder) UserCreate(ctx, input interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserCreate", reflect.TypeOf((*MockRepositoryInterface)(nil).UserCreate), ctx, input)
 }
 
-// UserGet mocks base method.
-func (m *MockRepositoryInterface) UserGet(ctx context.Context, input GetTestByIdInput) (GetTestByIdOutput, error) {
+// UserGetByPhone mocks base method.
+func (m *MockRepositoryInterface) UserGetByPhone(ctx context.Context, phone string) (*UserGet, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserGet", ctx, input)
-	ret0, _ := ret[0].(GetTestByIdOutput)
+	ret := m.ctrl.Call(m, "UserGetByPhone", ctx, phone)
+	ret0, _ := ret[0].(*UserGet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UserGet indicates an expected call of UserGet.
-func (mr *MockRepositoryInterfaceMockRecorder) UserGet(ctx, input interface{}) *gomock.Call {
+// UserGetByPhone indicates an expected call of UserGetByPhone.
+func (mr *MockRepositoryInterfaceMockRecorder) UserGetByPhone(ctx, phone interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserGet", reflect.TypeOf((*MockRepositoryInterface)(nil).UserGet), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserGetByPhone", reflect.TypeOf((*MockRepositoryInterface)(nil).UserGetByPhone), ctx, phone)
 }

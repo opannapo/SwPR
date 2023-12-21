@@ -63,6 +63,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /profile:
+    get:
+      operationId: profile
+      description: Profile User base on user token
+      responses:
+        '200':
+          description: Profile Detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProfileResOk"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /hello:
     get:
       summary: This is just a test endpoint to get you started. Please delete this endpoint.
@@ -154,3 +171,14 @@ components:
           type: string
         id:
           type: integer
+    GetProfileResOk:
+      description: User profile response OK
+      type: object
+      required:
+        - phone
+        - name
+      properties:
+        phone:
+          type: string
+        name:
+          type: string
