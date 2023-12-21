@@ -57,3 +57,20 @@ func (r *Repository) LoginAttemptCreate(ctx context.Context, input LoginAttemptC
 
 	return
 }
+
+func (r *Repository) UserGetById(ctx context.Context, id int64) (result *UserGet, err error) {
+	result = &UserGet{}
+	err = r.Db.QueryRowContext(ctx, "SELECT * FROM users WHERE id = $1", id).
+		Scan(
+			&result.Id,
+			&result.FullName,
+			&result.Password,
+			&result.Phone,
+			&result.CreatedAt,
+			&result.UpdatedAt,
+		)
+	if err != nil {
+		return nil, err
+	}
+	return result, err
+}

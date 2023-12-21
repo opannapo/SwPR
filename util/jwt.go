@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +14,7 @@ func JwtCreateToken(userID int64, jwtKey string, ttlDuration string) (tokenStrin
 	ttl, _ := time.ParseDuration(ttlDuration)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"sub": userID,
+			"sub": strconv.Itoa(int(userID)),
 			"iat": now.Unix(),
 			"exp": now.Add(ttl).Unix(),
 		},
@@ -52,8 +53,25 @@ func JwtParseToken(tokenString, jwtKey string) (token *jwt.Token, err error) {
 	})
 
 	if err != nil {
+		log.Println("error JwtParseToken", err)
 		return
 	}
 
+	return
+}
+
+func JwtGetSubjectUserID(jwt, jwtKey string) (userID int, err error) {
+	token, err := JwtParseToken(jwt, jwtKey)
+	if err != nil {
+		log.Println("error JwtParseToken", err)
+		return
+	}
+
+	userIdStr, err := token.Claims.GetSubject()
+	if err != nil {
+		log.Println("error Claims.GetSubject()", err)
+		return
+	}
+	userID, _ = strconv.Atoi(userIdStr)
 	return
 }

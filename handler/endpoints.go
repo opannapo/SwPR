@@ -133,6 +133,42 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 }
 
 func (s *Server) Profile(ctx echo.Context) error {
+	//Requirement no.4
+	//JWT as a bearer token in the authorization. Otherwise, return HTTP 403 Forbidden code.
+	jwt, err := getJwtFromHeaders(ctx.Request().Header)
+	if err != nil {
+		log.Println("error getJwtFromHeaders", err)
+		return ctx.JSON(http.StatusForbidden, generated.ErrorResponse{
+			Message: []interface{}{
+				err.Error(),
+			},
+		})
+	}
 
-	return nil
+	userID, err := util.JwtGetSubjectUserID(jwt, config.Instance.Security.JwtSecKey)
+	if err != nil {
+		log.Println("error JwtGetSubjectUserID", err)
+		return ctx.JSON(http.StatusForbidden, generated.ErrorResponse{
+			Message: []interface{}{
+				err.Error(),
+			},
+		})
+	}
+
+	user, err := s.Repository.UserGetById(ctx.Request().Context(), int64(userID))
+	if err != nil {
+		log.Println("error ", err)
+		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
+			Message: []interface{}{
+				err.Error(),
+			},
+		})
+	}
+
+	//Requirement no.4
+	//Upon successful verification, this will return the name of the user and the phone number.
+	return ctx.JSON(http.StatusOK, generated.GetProfileResOk{
+		Name:  user.FullName,
+		Phone: user.Phone,
+	})
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	middleware "github.com/oapi-codegen/echo-middleware"
@@ -12,6 +13,33 @@ import (
 	"swpr/generated"
 	"swpr/util"
 )
+
+func getJwtFromHeaders(headers http.Header) (jwt string, err error) {
+	authorizationHeader := headers["Authorization"]
+	if authorizationHeader == nil {
+		err = errors.New("Invalid authorization headers")
+		return
+	}
+
+	authHeader := strings.Split(authorizationHeader[0], " ")
+	if len(authHeader) < 2 {
+		err = errors.New("Invalid bearer format")
+		return
+	}
+
+	jwt = authHeader[1]
+	isVerify, err := util.JwtVerify(jwt, config.Instance.Security.JwtSecKey)
+	if err != nil {
+		log.Println("error JwtVerify", err)
+		return
+	}
+	if !isVerify {
+		log.Println("error JwtVerify isVerify", isVerify)
+		err = errors.New("Invalid token")
+		return
+	}
+	return
+}
 
 func JwtMiddlewareValidation() *middleware.Options {
 	return &middleware.Options{
@@ -31,25 +59,9 @@ func JwtMiddlewareValidation() *middleware.Options {
 			AuthenticationFunc: func(c context.Context, input *openapi3filter.AuthenticationInput) (err error) {
 				log.Println("AuthenticationFunc")
 
-				authorizationHeader := input.RequestValidationInput.Request.Header["Authorization"]
-				if authorizationHeader == nil {
-					return echo.NewHTTPError(401, "Invalid authorization headers")
-				}
-
-				authHeader := strings.Split(authorizationHeader[0], " ")
-				if len(authHeader) < 2 {
-					return echo.NewHTTPError(401, "Invalid bearer format")
-				}
-
-				jwt := authHeader[1]
-				isVerify, err := util.JwtVerify(jwt, config.Instance.Security.JwtSecKey)
+				_, err = getJwtFromHeaders(input.RequestValidationInput.Request.Header)
 				if err != nil {
-					log.Println("error JwtVerify", err)
-					return echo.NewHTTPError(401, "Invalid token")
-				}
-				if !isVerify {
-					log.Println("error JwtVerify isVerify", isVerify)
-					return echo.NewHTTPError(401, "Invalid token")
+					return echo.NewHTTPError(401, err)
 				}
 
 				return nil
