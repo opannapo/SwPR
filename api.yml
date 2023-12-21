@@ -17,6 +17,28 @@ info:
 servers:
   - url: http://localhost
 paths:
+  /register:
+    post:
+      description: Register User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterReq'
+      responses:
+        200:
+          description: Oke response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelloResponse"
+        400:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelloResponse"
   /hello:
     get:
       summary: This is just a test endpoint to get you started. Please delete this endpoint.
@@ -31,7 +53,7 @@ paths:
         '200':
           description: Test return
           content:
-            application/json:    
+            application/json:
               schema:
                 $ref: "#/components/schemas/HelloResponse"
         '404':
@@ -42,6 +64,27 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
+    RegisterReq:
+      description: User register payload
+      type: object
+      required:
+        - phone
+        - full_name
+        - password
+      properties:
+        full_name:
+          type: string
+          description: The full name of the user
+        phone:
+          type: string
+          description: The phone number of the user
+        password:
+          type: string
+          description: The password of the user
+        birthdate:
+          type: string
+          format: date
+          description: The birthdate of the user
     HelloResponse:
       type: object
       required:
