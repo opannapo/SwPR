@@ -32,13 +32,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HelloResponse"
+                $ref: "#/components/schemas/RegisterRes"
         400:
           description: Error response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HelloResponse"
+                $ref: "#/components/schemas/RegisterRes"
   /hello:
     get:
       summary: This is just a test endpoint to get you started. Please delete this endpoint.
@@ -85,6 +85,14 @@ components:
           type: string
           format: date
           description: The birthdate of the user
+    RegisterRes:
+      description: User register response
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
     HelloResponse:
       type: object
       required:

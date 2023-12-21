@@ -2,10 +2,9 @@ package main
 
 import (
 	"os"
-
-	"github.com/SawitProRecruitment/UserService/generated"
-	"github.com/SawitProRecruitment/UserService/handler"
-	"github.com/SawitProRecruitment/UserService/repository"
+	"swpr/generated"
+	"swpr/handler"
+	"swpr/repository"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,7 +15,7 @@ func main() {
 	var server generated.ServerInterface = newServer()
 
 	generated.RegisterHandlers(e, server)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1111"))
 }
 
 func newServer() *handler.Server {
