@@ -3,8 +3,8 @@ package repository
 
 import (
 	"database/sql"
-
 	_ "github.com/lib/pq"
+	"time"
 )
 
 type Repository struct {
@@ -20,6 +20,11 @@ func NewRepository(opts NewRepositoryOptions) *Repository {
 	if err != nil {
 		panic(err)
 	}
+
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(1 * time.Hour)
+
 	return &Repository{
 		Db: db,
 	}

@@ -19,6 +19,7 @@ servers:
 paths:
   /register:
     post:
+      operationId: register
       description: Register User
       requestBody:
         required: true
@@ -32,13 +33,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegisterRes"
+                $ref: "#/components/schemas/RegisterResOk"
         400:
           description: Error response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegisterRes"
+                $ref: "#/components/schemas/ErrorResponse"
   /hello:
     get:
       summary: This is just a test endpoint to get you started. Please delete this endpoint.
@@ -81,18 +82,17 @@ components:
         password:
           type: string
           description: The password of the user
-        birthdate:
-          type: string
-          format: date
-          description: The birthdate of the user
-    RegisterRes:
-      description: User register response
+    RegisterResOk:
+      description: User register response OK
       type: object
       required:
         - success
+        - id
       properties:
         success:
           type: boolean
+        id:
+          type: integer
     HelloResponse:
       type: object
       required:
@@ -106,4 +106,4 @@ components:
         - message
       properties:
         message:
-          type: string
+          type: array

@@ -26,7 +26,7 @@ func main() {
 
 func newServer() *handler.Server {
 	cfg := config.Instance
-	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+	dbDsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.Database.Username, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name,
 	)
 
@@ -36,5 +36,6 @@ func newServer() *handler.Server {
 	opts := handler.NewServerOptions{
 		Repository: repo,
 	}
+
 	return handler.NewServer(opts)
 }
