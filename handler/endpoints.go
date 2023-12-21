@@ -86,6 +86,16 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 		})
 	}
 
+	//Compute param plain password with hash password on user result
+	isMatch := util.CheckPasswordHash(req.Password, user.Password)
+	if !isMatch {
+		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
+			Message: []interface{}{
+				"Invalid Credential",
+			},
+		})
+	}
+
 	return ctx.JSON(http.StatusOK, generated.LoginResOk{
 		Id: int(user.Id),
 	})
