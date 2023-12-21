@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"log"
@@ -87,13 +88,26 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 	}
 
 	//Requirement no.3
+	//Capture data login attempt
+	var isLoginSuccess = false
+	defer func() {
+		if user != nil {
+			_, _ = s.Repository.LoginAttemptCreate(ctx.Request().Context(), repository.LoginAttemptCreate{
+				UserID: user.Id,
+				Status: isLoginSuccess,
+			})
+		}
+	}()
+
+	//Requirement no.3
 	//Compute param plain password with hash password on user result.
 	//Unsuccessful login will return HTTP 400 Bad Requests code.
 	isMatch := util.CheckPasswordHash(req.Password, user.Password)
 	if !isMatch {
+		err = errors.New("Invalid Credential")
 		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
 			Message: []interface{}{
-				"Invalid Credential",
+				err.Error(),
 			},
 		})
 	}
@@ -101,6 +115,15 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 	//Requirement no.3
 	//JWT with algorithm RS256.
 	stringToken, err := util.JwtCreateToken(user.Id)
+	if err != nil {
+		log.Println("error ", err)
+		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
+			Message: []interface{}{
+				err.Error(),
+			},
+		})
+	}
+	isLoginSuccess = true
 
 	return ctx.JSON(http.StatusOK, generated.LoginResOk{
 		Id:    int(user.Id),

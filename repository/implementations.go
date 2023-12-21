@@ -27,23 +27,33 @@ func (r *Repository) UserCreate(ctx context.Context, input UserCreate) (idResult
 	return
 }
 
-func (r *Repository) UserGetByPhone(ctx context.Context, phone string) (output UserGet, err error) {
+func (r *Repository) UserGetByPhone(ctx context.Context, phone string) (result *UserGet, err error) {
+	result = &UserGet{}
 	err = r.Db.QueryRowContext(ctx, "SELECT * FROM users WHERE phone = $1", phone).
 		Scan(
-			&output.Id,
-			&output.FullName,
-			&output.Password,
-			&output.Phone,
-			&output.CreatedAt,
-			&output.UpdatedAt,
+			&result.Id,
+			&result.FullName,
+			&result.Password,
+			&result.Phone,
+			&result.CreatedAt,
+			&result.UpdatedAt,
 		)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return result, err
 }
 
 func (r *Repository) LoginAttemptCreate(ctx context.Context, input LoginAttemptCreate) (idResult int64, err error) {
-	//TODO implement me
-	panic("implement me")
+	sql := `
+		INSERT INTO login_attempt (user_id, status)
+		VALUES ($1, $2)
+		RETURNING id`
+
+	err = r.Db.QueryRowContext(ctx, sql, input.UserID, input.Status).Scan(&idResult)
+	if err != nil {
+		log.Println("error ", err)
+	}
+
+	return
 }

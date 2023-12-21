@@ -9,6 +9,6 @@ import "context"
 type RepositoryInterface interface {
 	GetTestById(ctx context.Context, input GetTestByIdInput) (output GetTestByIdOutput, err error)
 	UserCreate(ctx context.Context, input UserCreate) (idResult int64, err error)
-	UserGetByPhone(ctx context.Context, phone string) (output UserGet, err error)
+	UserGetByPhone(ctx context.Context, phone string) (output *UserGet, err error)
 	LoginAttemptCreate(ctx context.Context, input LoginAttemptCreate) (idResult int64, err error)
 }
