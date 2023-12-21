@@ -1,7 +1,8 @@
 package main
 
 import (
-	"os"
+	"fmt"
+	"swpr/config"
 	"swpr/generated"
 	"swpr/handler"
 	"swpr/repository"
@@ -10,6 +11,11 @@ import (
 )
 
 func main() {
+	err := config.InitConfigInstance()
+	if err != nil {
+		panic(err)
+		return
+	}
 	e := echo.New()
 
 	var server generated.ServerInterface = newServer()
@@ -19,7 +25,11 @@ func main() {
 }
 
 func newServer() *handler.Server {
-	dbDsn := os.Getenv("DATABASE_URL")
+	cfg := config.Instance
+	dbDsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		cfg.Database.Username, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name,
+	)
+
 	var repo repository.RepositoryInterface = repository.NewRepository(repository.NewRepositoryOptions{
 		Dsn: dbDsn,
 	})
