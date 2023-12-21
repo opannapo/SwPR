@@ -82,6 +82,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: profileUpdate
+      description: Update User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileReq'
+      responses:
+        200:
+          description: Oke response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProfileResOk"
+        400:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   securitySchemes:
     bearerAuth:
@@ -117,13 +139,6 @@ components:
           type: boolean
         id:
           type: integer
-    HelloResponse:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
     ErrorResponse:
       type: object
       required:
@@ -166,3 +181,24 @@ components:
           type: string
         name:
           type: string
+    UpdateProfileReq:
+      description: User update payload
+      type: object
+      properties:
+        full_name:
+          type: string
+          description: The full name of the user
+        phone:
+          type: string
+          description: The phone number of the user
+    UpdateProfileResOk:
+      description: User register response OK
+      type: object
+      required:
+        - success
+        - id
+      properties:
+        success:
+          type: boolean
+        id:
+          type: integer
