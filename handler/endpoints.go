@@ -66,3 +66,27 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 		Id:      int(idResult),
 	})
 }
+
+func (s *Server) Login(ctx echo.Context) (err error) {
+	req := new(generated.RegisterReq)
+	if err = ctx.Bind(req); err != nil {
+		log.Println("Error ", err)
+		return ctx.JSON(http.StatusBadRequest, nil)
+	}
+
+	//Requirement no.3
+	//Check database whether the combination exists (phone & password).
+	user, err := s.Repository.UserGetByPhone(ctx.Request().Context(), req.Phone)
+	if err != nil {
+		log.Println("error ", err)
+		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
+			Message: []interface{}{
+				err.Error(),
+			},
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, generated.LoginResOk{
+		Id: int(user.Id),
+	})
+}
