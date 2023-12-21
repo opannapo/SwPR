@@ -40,6 +40,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /login:
+    post:
+      operationId: login
+      description: Login User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginReq'
+      responses:
+        200:
+          description: Oke response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResOk"
+        400:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /hello:
     get:
       summary: This is just a test endpoint to get you started. Please delete this endpoint.
@@ -107,3 +130,27 @@ components:
       properties:
         message:
           type: array
+    LoginReq:
+      description: User login payload
+      type: object
+      required:
+        - phone
+        - password
+      properties:
+        phone:
+          type: string
+          description: The phone number of the user
+        password:
+          type: string
+          description: The password of the user
+    LoginResOk:
+      description: User register response OK
+      type: object
+      required:
+        - token
+        - id
+      properties:
+        token:
+          type: string
+        id:
+          type: integer
