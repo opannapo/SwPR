@@ -25,14 +25,19 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 
 	var errMsgsValidation []interface{}
 
-	//validation
-	isPhoneValid := util.ValidatePhoneForRegister(req.Phone)
+	//requirement no.1 validation
+	//
+	isPhoneValid := util.ValidatePhoneFormat(req.Phone)
 	if !isPhoneValid {
 		errMsgsValidation = append(errMsgsValidation, "invalid phone number format")
 	}
-	isNameValid := util.ValidateNameForRegister(req.FullName)
+	isNameValid := util.ValidateFullNameFormat(req.FullName)
 	if !isNameValid {
 		errMsgsValidation = append(errMsgsValidation, "invalid fullname. Min.3 Max.60")
+	}
+	isPasswordValid := util.ValidatePasswordFormat(req.Password)
+	if !isPasswordValid {
+		errMsgsValidation = append(errMsgsValidation, "invalid password. Min.6 Max.64")
 	}
 
 	if len(errMsgsValidation) != 0 {
