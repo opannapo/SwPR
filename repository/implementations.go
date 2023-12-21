@@ -74,3 +74,31 @@ func (r *Repository) UserGetById(ctx context.Context, id int64) (result *UserGet
 	}
 	return result, err
 }
+
+func (r *Repository) UserUpdate(ctx context.Context, input UserUpdate) (idResult int64, err error) {
+	sql := `
+		UPDATE users SET 
+			full_name=$1,
+			password=$2,
+			phone=$3,
+			created_at=$4,
+			updated_at=$5
+		WHERE id=$6
+		RETURNING id
+	`
+
+	err = r.Db.QueryRowContext(
+		ctx, sql,
+		input.FullName,
+		input.Password,
+		input.Phone,
+		input.CreatedAt,
+		input.UpdatedAt,
+		input.Id,
+	).Scan(&idResult)
+	if err != nil {
+		log.Println("error ", err)
+	}
+
+	return
+}

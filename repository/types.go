@@ -16,14 +16,21 @@ type UserCreate struct {
 	Password string
 	Phone    string
 }
-
+type UserUpdate struct {
+	Id        int64
+	FullName  string
+	Password  string
+	Phone     string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
 type UserGet struct {
 	Id        int64
 	FullName  string
 	Password  string
 	Phone     string
-	CreatedAt sql.NullString
-	UpdatedAt sql.NullString
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
 }
 
 type LoginAttemptCreate struct {

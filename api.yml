@@ -85,6 +85,8 @@ paths:
     put:
       operationId: profileUpdate
       description: Update User
+      security:
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -100,6 +102,12 @@ paths:
                 $ref: "#/components/schemas/UpdateProfileResOk"
         400:
           description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Forbidden
           content:
             application/json:
               schema:

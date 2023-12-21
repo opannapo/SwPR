@@ -12,4 +12,5 @@ type RepositoryInterface interface {
 	UserGetByPhone(ctx context.Context, phone string) (result *UserGet, err error)
 	LoginAttemptCreate(ctx context.Context, input LoginAttemptCreate) (idResult int64, err error)
 	UserGetById(ctx context.Context, id int64) (result *UserGet, err error)
+	UserUpdate(ctx context.Context, input UserUpdate) (idResult int64, err error)
 }

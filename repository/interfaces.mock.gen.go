@@ -108,3 +108,18 @@ func (mr *MockRepositoryInterfaceMockRecorder) UserGetByPhone(ctx, phone interfa
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserGetByPhone", reflect.TypeOf((*MockRepositoryInterface)(nil).UserGetByPhone), ctx, phone)
 }
+
+// UserUpdate mocks base method.
+func (m *MockRepositoryInterface) UserUpdate(ctx context.Context, input UserUpdate) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserUpdate", ctx, input)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserUpdate indicates an expected call of UserUpdate.
+func (mr *MockRepositoryInterfaceMockRecorder) UserUpdate(ctx, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserUpdate", reflect.TypeOf((*MockRepositoryInterface)(nil).UserUpdate), ctx, input)
+}
