@@ -25,8 +25,8 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 
 	var errMsgsValidation []interface{}
 
-	//requirement no.1 validation
-	//
+	//Requirement no.1 validation
+	//Phone format, name format & password format
 	isPhoneValid := util.ValidatePhoneFormat(req.Phone)
 	if !isPhoneValid {
 		errMsgsValidation = append(errMsgsValidation, "invalid phone number format")
@@ -40,15 +40,16 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 		errMsgsValidation = append(errMsgsValidation, "invalid password. Min.6 Max.64")
 	}
 
+	//Requirement no.2, status bad request, return all error fields, The password should be hashed,
 	if len(errMsgsValidation) != 0 {
 		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
 			Message: errMsgsValidation,
 		})
 	}
-
+	hashPwd, err := util.HashPassword(req.Password)
 	idResult, err := s.Repository.UserCreate(ctx.Request().Context(), repository.UserCreate{
 		FullName: req.FullName,
-		Password: req.Password,
+		Password: hashPwd,
 		Phone:    req.Phone,
 	})
 	if err != nil {
