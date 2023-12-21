@@ -255,6 +255,7 @@ func (s *Server) ProfileUpdate(ctx echo.Context) error {
 		},
 	})
 	if err != nil {
+		//todo check error duplicate phone number
 		log.Println("error ", err)
 		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
 			Message: []interface{}{
