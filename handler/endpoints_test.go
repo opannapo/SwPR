@@ -562,3 +562,72 @@ func (h *HandlerTestSuite) TestServer_Update() {
 		})
 	}
 }
+
+func (h *HandlerTestSuite) TestServer_GetProfile() {
+	type testCase struct {
+		caseName         string
+		expectedLogic    func(ctx echo.Context, c testCase)
+		expectedResponse func(actualRes *http.Response)
+		token            string
+	}
+	cases := []testCase{
+		{
+			caseName: "Success 200",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, nil)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 200, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["name"])
+				assert.NotEmpty(h.T(), resMap["phone"])
+				assert.Equal(h.T(), "opannapo", resMap["name"])
+				assert.Equal(h.T(), "+628561234532", resMap["phone"])
+			},
+		},
+		{
+			caseName:      "Error invalid token",
+			token:         "bearer",
+			expectedLogic: func(ctx echo.Context, c testCase) {},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusForbidden, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), "Invalid bearer format", errMsg)
+			},
+		},
+	}
+
+	for _, c := range cases {
+		h.Run(c.caseName, func() {
+			req := httptest.NewRequest(http.MethodGet, "/profile", nil)
+			req.Header.Set(echo.HeaderAuthorization, c.token)
+
+			rec := httptest.NewRecorder()
+			eCtx := h.Echo.NewContext(req, rec)
+
+			c.expectedLogic(eCtx, c)
+			_ = h.Server.Profile(eCtx)
+
+			//validate detail response
+			c.expectedResponse(rec.Result())
+		})
+	}
+}
