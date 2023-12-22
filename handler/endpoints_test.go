@@ -131,9 +131,10 @@ func (h *HandlerTestSuite) TestServer_Login() {
 
 			},
 			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 200, actualRes.StatusCode)
 				resMap := h.parseResponseJson(actualRes)
-				assert.NotEmpty(h.T(), resMap["response"])
-				assert.Equal(h.T(), false, resMap["next"])
+				assert.NotEmpty(h.T(), resMap["id"])
+				assert.NotEmpty(h.T(), resMap["token"])
 			},
 		},
 	}
@@ -148,6 +149,9 @@ func (h *HandlerTestSuite) TestServer_Login() {
 
 			c.expectedLogic(eCtx, c)
 			_ = h.Server.Login(eCtx)
+
+			//validate detail response
+			c.expectedResponse(rec.Result())
 		})
 	}
 }
