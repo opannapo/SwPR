@@ -40,9 +40,10 @@ func TestCheckPasswordHash(t *testing.T) {
 			want: false,
 		},
 	}
+	pwdUtil := util.NewPasswordUtil()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := util.CheckPasswordHash(tt.args.password, tt.args.hash); got != tt.want {
+			if got := pwdUtil.CheckPasswordHash(tt.args.password, tt.args.hash); got != tt.want {
 				t.Errorf("CheckPasswordHash() = %v, want %v", got, tt.want)
 			}
 		})
@@ -66,10 +67,11 @@ func TestHashPassword(t *testing.T) {
 			isGeneratedHashValid: true,
 		},
 	}
+	pwdUtil := util.NewPasswordUtil()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := util.HashPassword(tt.args.password)
-			actualMatch := util.CheckPasswordHash(tt.args.password, got)
+			got, _ := pwdUtil.HashPassword(tt.args.password)
+			actualMatch := pwdUtil.CheckPasswordHash(tt.args.password, got)
 			if tt.isGeneratedHashValid != actualMatch {
 				t.Errorf("HashPassword() got = %v, want isMatch %v, actualMatch %v", got, tt.isGeneratedHashValid, actualMatch)
 			}

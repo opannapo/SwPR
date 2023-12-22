@@ -11,6 +11,7 @@ import (
 	"swpr/generated"
 	"swpr/handler"
 	"swpr/repository"
+	"swpr/util"
 )
 
 func main() {
@@ -45,7 +46,8 @@ func newServer() *handler.Server {
 		Dsn: dbDsn,
 	})
 	opts := handler.NewServerOptions{
-		Repository: repo,
+		Repository:   repo,
+		PasswordUtil: util.NewPasswordUtil(),
 	}
 
 	return handler.NewServer(opts)

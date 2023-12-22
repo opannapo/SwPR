@@ -49,7 +49,8 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 			Message: errMsgsValidation,
 		})
 	}
-	hashPwd, err := util.HashPassword(req.Password)
+
+	hashPwd, err := s.PasswordUtil.HashPassword(req.Password)
 	idResult, err := s.Repository.UserCreate(ctx.Request().Context(), repository.UserCreate{
 		FullName: req.FullName,
 		Password: hashPwd,
@@ -112,7 +113,7 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 	//Requirement no.3
 	//Compute param plain password with hash password on user result.
 	//Unsuccessful login will return HTTP 400 Bad Requests code.
-	isMatch := util.CheckPasswordHash(req.Password, user.Password)
+	isMatch := s.PasswordUtil.CheckPasswordHash(req.Password, user.Password)
 	if !isMatch {
 		err = errors.New("Invalid Credential")
 		return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
