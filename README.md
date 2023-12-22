@@ -37,7 +37,7 @@ To run the project, run the following command:
 docker-compose up --build
 ```
 
-You should be able to access the API at http://localhost:8080
+You should be able to access the API at http://localhost:1111
 
 If you change `database.sql` file, you need to reinitate the database by running:
 
