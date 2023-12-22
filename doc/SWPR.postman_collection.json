@@ -1,0 +1,394 @@
+{
+	"info": {
+		"_postman_id": "a7a5eb9b-8d1f-45b1-873f-17b507c4d693",
+		"name": "SWPR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5964966"
+	},
+	"item": [
+		{
+			"name": "profile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMzMjU1NTUsImlhdCI6MTcwMzIzOTE1NSwic3ViIjoiMSJ9.i57vXRPHkhxIGQT5D1hHTqgRNRZr4mD95ms9rE6oqKo",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:1111/profile",
+					"host": [
+						"localhost"
+					],
+					"port": "1111",
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"full_name\": \"opan2\",\n    \"password\": \"222222\",\n    \"phone\": \"+628561234222222\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1111/register",
+					"host": [
+						"localhost"
+					],
+					"port": "1111",
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Error Validation [Multiple]",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"aa\",\n    \"password\": \"aaa\",\n    \"phone\": \"+62123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/register",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 09:53:01 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "77"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": [\n        \"invalid phone number format\",\n        \"invalid fullname. Min.3 Max.60\",\n        \"invalid password. Min.6 Max.64\"\n    ]\n}"
+				},
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"opan2\",\n    \"password\": \"222222\",\n    \"phone\": \"+628561234552\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/register",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 15:10:28 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "24"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 5,\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"full_name\": \"opannapo-edit-2\",\n    \"phone\": \"+628561234511111\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1111/profile",
+					"host": [
+						"localhost"
+					],
+					"port": "1111",
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Error Validation [Multiple]",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"aa\",\n    \"password\": \"aaa\",\n    \"phone\": \"+62123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/register",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 09:53:01 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "77"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": [\n        \"invalid phone number format\",\n        \"invalid fullname. Min.3 Max.60\",\n        \"invalid password. Min.6 Max.64\"\n    ]\n}"
+				},
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"opan2\",\n    \"password\": \"222222\",\n    \"phone\": \"+628561234552\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/register",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 15:10:28 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "24"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 5,\n    \"success\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"222222\",\n    \"phone\": \"+628561234222222\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1111/login",
+					"host": [
+						"localhost"
+					],
+					"port": "1111",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"111111\",\n    \"phone\": \"+628561234532\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/login",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 15:09:36 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "159"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 1,\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMxNzE0MzYsImlhdCI6MTcwMzE3MTM3Niwic3ViIjoxfQ.NOgY2RbK7D3bGnhuDiKCuGtIdZ-9xKVf326ickFvIDs\"\n}"
+				},
+				{
+					"name": "Failed",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"1111112\",\n    \"phone\": \"+628561234532\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:1111/login",
+							"host": [
+								"localhost"
+							],
+							"port": "1111",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 21 Dec 2023 15:11:58 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "35"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": [\n        \"Invalid Credential\"\n    ]\n}"
+				}
+			]
+		}
+	]
+}
