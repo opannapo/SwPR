@@ -71,7 +71,7 @@ func (s *Server) Register(ctx echo.Context) (err error) {
 }
 
 func (s *Server) Login(ctx echo.Context) (err error) {
-	req := new(generated.RegisterReq)
+	req := new(generated.LoginReq)
 	if err = ctx.Bind(req); err != nil {
 		log.Println("Error ", err)
 		return ctx.JSON(http.StatusBadRequest, nil)
@@ -82,6 +82,14 @@ func (s *Server) Login(ctx echo.Context) (err error) {
 	user, err := s.Repository.UserGetByPhone(ctx.Request().Context(), req.Phone)
 	if err != nil {
 		log.Println("error ", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return ctx.JSON(http.StatusBadRequest, generated.ErrorResponse{
+				Message: []interface{}{
+					"Invalid phone or password",
+				},
+			})
+		}
+
 		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
 			Message: []interface{}{
 				err.Error(),
