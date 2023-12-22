@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/lib/pq"
 	middleware "github.com/oapi-codegen/echo-middleware"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -332,6 +333,229 @@ func (h *HandlerTestSuite) TestServer_Register() {
 
 			c.expectedLogic(eCtx, c)
 			_ = h.Server.Register(eCtx)
+
+			//validate detail response
+			c.expectedResponse(rec.Result())
+		})
+	}
+}
+
+func (h *HandlerTestSuite) TestServer_Update() {
+	type testCase struct {
+		caseName         string
+		expectedLogic    func(ctx echo.Context, c testCase)
+		expectedResponse func(actualRes *http.Response)
+		payloadJson      string
+		token            string
+	}
+	cases := []testCase{
+		{
+			caseName: "Success 200",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			payloadJson: `{
+				"full_name": "opannapo-edit-2",
+				"phone": "+628561234511111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, nil)
+
+				h.mockRepository.EXPECT().
+					UserUpdate(ctx.Request().Context(), gomock.Any()).
+					Return(int64(1), nil)
+
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 200, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["id"])
+				assert.NotEmpty(h.T(), resMap["success"])
+				assert.Equal(h.T(), resMap["success"], true)
+			},
+		},
+		{
+			caseName: "Error 409 phone number already exists",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			payloadJson: `{
+				"full_name": "opannapo-edit-2",
+				"phone": "+628561234511111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, nil)
+
+				driverErr := pq.Error{
+					Code: "23505",
+				}
+				h.mockRepository.EXPECT().
+					UserUpdate(ctx.Request().Context(), gomock.Any()).
+					Return(int64(1), &driverErr)
+
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusConflict, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "Error pq code 23505")
+			},
+		},
+		{
+			caseName: "Error invalid token",
+			token:    "bearer",
+			payloadJson: `{
+				"full_name": "opannapo-edit-2",
+				"phone": "+628561234511111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusForbidden, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), "Invalid bearer format", errMsg)
+			},
+		},
+		{
+			caseName: "Error invalid phone mnumber",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			payloadJson: `{
+				"full_name": "opannapo-edit-2",
+				"phone": "+628561234511111000000"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, nil)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusBadRequest, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), "invalid phone number format", errMsg)
+			},
+		},
+		{
+			caseName: "Error invalid name format",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			payloadJson: `{
+				"full_name": "op",
+				"phone": "+62856123451111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, nil)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusBadRequest, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), "invalid fullname. Min.3 Max.60", errMsg)
+			},
+		},
+		{
+			caseName: "Error db query get user",
+			token:    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMyNzQ0NjUsImlhdCI6MTcwMzE4ODA2NSwic3ViIjoiMSJ9.jUQOUOWwixgvhtbq5AnVbsSTkE7F74uJqn_fvopb95g",
+			payloadJson: `{
+				"full_name": "opan",
+				"phone": "+62856123451111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opan",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+62856123451111",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetById(ctx.Request().Context(), int64(1)).
+					Return(&userRresult, sql.ErrConnDone)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), http.StatusInternalServerError, actualRes.StatusCode)
+
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), sql.ErrConnDone.Error(), errMsg)
+			},
+		},
+	}
+
+	for _, c := range cases {
+		h.Run(c.caseName, func() {
+			req := httptest.NewRequest(http.MethodPut, "/profile", strings.NewReader(c.payloadJson))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			req.Header.Set(echo.HeaderAuthorization, c.token)
+
+			rec := httptest.NewRecorder()
+			eCtx := h.Echo.NewContext(req, rec)
+
+			c.expectedLogic(eCtx, c)
+			_ = h.Server.ProfileUpdate(eCtx)
 
 			//validate detail response
 			c.expectedResponse(rec.Result())
