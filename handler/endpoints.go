@@ -3,7 +3,9 @@ package handler
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/lib/pq"
 	"log"
 	"net/http"
 	"swpr/config"
@@ -255,8 +257,24 @@ func (s *Server) ProfileUpdate(ctx echo.Context) error {
 		},
 	})
 	if err != nil {
-		//todo check error duplicate phone number
 		log.Println("error ", err)
+
+		//Requirement no.5
+		//Already exist phone number returns HTTP 409 Conflict.
+		var driverErr *pq.Error
+		ok := errors.As(err, &driverErr)
+		if ok {
+			if driverErr.Code == "23505" { //pq: duplicate key value violates unique constraint
+				return ctx.JSON(http.StatusConflict, generated.ErrorResponse{
+					Message: []interface{}{
+						fmt.Sprintf("Error pq code %v", driverErr.Code),
+						err.Error(),
+						driverErr.Detail,
+					},
+				})
+			}
+		}
+
 		return ctx.JSON(http.StatusInternalServerError, generated.ErrorResponse{
 			Message: []interface{}{
 				err.Error(),
