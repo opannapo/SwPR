@@ -137,6 +137,42 @@ func (h *HandlerTestSuite) TestServer_Login() {
 				assert.NotEmpty(h.T(), resMap["token"])
 			},
 		},
+		{
+			caseName:    "Error Invalid Password",
+			payloadJson: `{"password": "222222","phone": "+628561234532"}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				userRresult := repository.UserGet{
+					Id:        1,
+					FullName:  "opannapo",
+					Password:  "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
+					Phone:     "+628561234532",
+					CreatedAt: sql.NullTime{},
+					UpdatedAt: sql.NullTime{},
+				}
+				h.mockRepository.EXPECT().
+					UserGetByPhone(ctx.Request().Context(), "+628561234532").
+					Return(&userRresult, nil)
+
+				h.mockRepository.EXPECT().
+					LoginAttemptCreate(ctx.Request().Context(), repository.LoginAttemptCreate{
+						UserID: 1,
+						Status: false,
+					}).
+					Return(int64(1), nil)
+
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 400, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "Invalid Credential")
+			},
+		},
 	}
 
 	for _, c := range cases {
