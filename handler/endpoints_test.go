@@ -26,11 +26,11 @@ import (
 
 type HandlerTestSuite struct {
 	suite.Suite
-	mockRepository *repository_mock.MockRepositoryInterface
-	mockUtil       *util_mock.MockPasswordInterface
-	config         *config.AppConfig
-	Server         generated.ServerInterface
-	Echo           *echo.Echo
+	mockRepository   *repository_mock.MockRepositoryInterface
+	mockPasswordUtil *util_mock.MockPasswordInterface
+	config           *config.AppConfig
+	Server           generated.ServerInterface
+	Echo             *echo.Echo
 }
 
 func (h *HandlerTestSuite) SetupSuite() {
@@ -52,6 +52,9 @@ func (h *HandlerTestSuite) SetupSuite() {
 
 	//Repo
 	h.mockRepository = repository_mock.NewMockRepositoryInterface(mockCtrl)
+
+	//util
+	h.mockPasswordUtil = util_mock.NewMockPasswordInterface(mockCtrl)
 
 	h.Echo = echo.New()
 	h.Server = h.newServer()
@@ -96,7 +99,8 @@ func (h *HandlerTestSuite) printResult(caseName interface{}, expected interface{
 
 func (h *HandlerTestSuite) newServer() *Server {
 	opts := NewServerOptions{
-		Repository: h.mockRepository,
+		Repository:   h.mockRepository,
+		PasswordUtil: h.mockPasswordUtil,
 	}
 	return NewServer(opts)
 }
@@ -132,6 +136,7 @@ func (h *HandlerTestSuite) TestServer_Login() {
 					}).
 					Return(int64(1), nil)
 
+				h.mockPasswordUtil.EXPECT().CheckPasswordHash("111111", userRresult.Password).Return(true)
 			},
 			expectedResponse: func(actualRes *http.Response) {
 				assert.Equal(h.T(), 200, actualRes.StatusCode)
@@ -163,6 +168,7 @@ func (h *HandlerTestSuite) TestServer_Login() {
 					}).
 					Return(int64(1), nil)
 
+				h.mockPasswordUtil.EXPECT().CheckPasswordHash("222222", userRresult.Password).Return(false)
 			},
 			expectedResponse: func(actualRes *http.Response) {
 				assert.Equal(h.T(), 400, actualRes.StatusCode)
@@ -231,11 +237,14 @@ func (h *HandlerTestSuite) TestServer_Register() {
 				"phone": "+628561234511111"
 			}`,
 			expectedLogic: func(ctx echo.Context, c testCase) {
-				str := gomock.Any()
+				h.mockPasswordUtil.EXPECT().
+					HashPassword("111111").
+					Return("$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO", nil)
+
 				h.mockRepository.EXPECT().
 					UserCreate(ctx.Request().Context(), repository.UserCreate{
 						FullName: "opan2",
-						Password: str.String(),
+						Password: "$2a$10$sxVsc/YxnHyQvFXeV1L2YuazNV8yEyLOF524o1AlFbSy6wjJx9rkO",
 						Phone:    "+628561234511111",
 					}).
 					Return(int64(1), nil)
@@ -244,7 +253,8 @@ func (h *HandlerTestSuite) TestServer_Register() {
 				assert.Equal(h.T(), 200, actualRes.StatusCode)
 				resMap := h.parseResponseJson(actualRes)
 				assert.NotEmpty(h.T(), resMap["id"])
-				assert.NotEmpty(h.T(), resMap["token"])
+				assert.NotEmpty(h.T(), resMap["success"])
+				assert.Equal(h.T(), resMap["success"], true)
 			},
 		},
 	}
