@@ -173,6 +173,26 @@ func (h *HandlerTestSuite) TestServer_Login() {
 				assert.Equal(h.T(), errMsg, "Invalid Credential")
 			},
 		},
+		{
+			caseName:    "Error User Not Found",
+			payloadJson: `{"password": "222222","phone": "+628561234532"}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				h.mockRepository.EXPECT().
+					UserGetByPhone(ctx.Request().Context(), "+628561234532").
+					Return(nil, sql.ErrNoRows)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 400, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "Invalid phone or password")
+			},
+		},
 	}
 
 	for _, c := range cases {
