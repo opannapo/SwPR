@@ -3,7 +3,6 @@ module swpr
 go 1.19
 
 require (
-	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/getkin/kin-openapi v0.118.0
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/golang-jwt/jwt/v5 v5.2.0

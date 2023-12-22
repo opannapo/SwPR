@@ -18,13 +18,16 @@ import (
 	"strings"
 	"swpr/config"
 	"swpr/generated"
+	repository_mock "swpr/mock/repository"
+	util_mock "swpr/mock/util"
 	"swpr/repository"
 	"testing"
 )
 
 type HandlerTestSuite struct {
 	suite.Suite
-	mockRepository *repository.MockRepositoryInterface
+	mockRepository *repository_mock.MockRepositoryInterface
+	mockUtil       *util_mock.MockPasswordInterface
 	config         *config.AppConfig
 	Server         generated.ServerInterface
 	Echo           *echo.Echo
@@ -48,7 +51,7 @@ func (h *HandlerTestSuite) SetupSuite() {
 	h.config = config.Instance
 
 	//Repo
-	h.mockRepository = repository.NewMockRepositoryInterface(mockCtrl)
+	h.mockRepository = repository_mock.NewMockRepositoryInterface(mockCtrl)
 
 	h.Echo = echo.New()
 	h.Server = h.newServer()
@@ -205,6 +208,57 @@ func (h *HandlerTestSuite) TestServer_Login() {
 
 			c.expectedLogic(eCtx, c)
 			_ = h.Server.Login(eCtx)
+
+			//validate detail response
+			c.expectedResponse(rec.Result())
+		})
+	}
+}
+
+func (h *HandlerTestSuite) TestServer_Register() {
+	type testCase struct {
+		caseName         string
+		expectedLogic    func(ctx echo.Context, c testCase)
+		expectedResponse func(actualRes *http.Response)
+		payloadJson      string
+	}
+	cases := []testCase{
+		{
+			caseName: "Success 200",
+			payloadJson: `{
+				"full_name": "opan2",
+				"password": "111111",
+				"phone": "+628561234511111"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+				str := gomock.Any()
+				h.mockRepository.EXPECT().
+					UserCreate(ctx.Request().Context(), repository.UserCreate{
+						FullName: "opan2",
+						Password: str.String(),
+						Phone:    "+628561234511111",
+					}).
+					Return(int64(1), nil)
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 200, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["id"])
+				assert.NotEmpty(h.T(), resMap["token"])
+			},
+		},
+	}
+
+	for _, c := range cases {
+		h.Run(c.caseName, func() {
+			req := httptest.NewRequest(http.MethodPost, "/register", strings.NewReader(c.payloadJson))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			rec := httptest.NewRecorder()
+			eCtx := h.Echo.NewContext(req, rec)
+
+			c.expectedLogic(eCtx, c)
+			_ = h.Server.Register(eCtx)
 
 			//validate detail response
 			c.expectedResponse(rec.Result())

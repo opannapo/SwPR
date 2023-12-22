@@ -16,7 +16,7 @@ init: generate
 test:
 	go test -short -coverprofile coverage.out -v ./...
 
-generate: generated generate_mocks
+generate: generated generate_mocks generate_mocks_util
 
 generated: api.yml
 	@echo "Generating files..."
@@ -26,10 +26,14 @@ generated: api.yml
 INTERFACES_GO_FILES := $(shell find repository -name "interfaces.go")
 INTERFACES_GEN_GO_FILES := $(INTERFACES_GO_FILES:%.go=%.mock.gen.go)
 
-generate_mocks: $(INTERFACES_GEN_GO_FILES)
-$(INTERFACES_GEN_GO_FILES): %.mock.gen.go: %.go
-	@echo "Generating mocks $@ for $<"
-	mockgen -source=$< -destination=$@ -package=$(shell basename $(dir $<))
+#generate_mocks: $(INTERFACES_GEN_GO_FILES)
+#$(INTERFACES_GEN_GO_FILES): %.mock.gen.go: %.go
+#	@echo "Generating mocks $@ for $<"
+#	mockgen -source=$< -destination=$@ -package=$(shell basename $(dir $<))
+
+generate_mocks:
+	mockgen -source="repository/interfaces.go" -destination="mock/repository/interfaces.go" -package="repository_mock"
+	mockgen -source="util/password.go" -destination="mock/util/password.go" -package="util_mock"
 
 compose-up:
 	sudo docker-compose up --build -d
