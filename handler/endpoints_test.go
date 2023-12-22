@@ -257,6 +257,69 @@ func (h *HandlerTestSuite) TestServer_Register() {
 				assert.Equal(h.T(), resMap["success"], true)
 			},
 		},
+		{
+			caseName: "Error phone format : too short",
+			payloadJson: `{
+				"full_name": "opan2",
+				"password": "111111",
+				"phone": "+6285612345"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 400, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "invalid phone number format")
+			},
+		},
+		{
+			caseName: "Error name format : too short",
+			payloadJson: `{
+				"full_name": "op",
+				"password": "111111",
+				"phone": "+62856123455678"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 400, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "invalid fullname. Min.3 Max.60")
+			},
+		},
+		{
+			caseName: "Error password format : too short",
+			payloadJson: `{
+				"full_name": "opan",
+				"password": "111",
+				"phone": "+62856123455678"
+			}`,
+			expectedLogic: func(ctx echo.Context, c testCase) {
+			},
+			expectedResponse: func(actualRes *http.Response) {
+				assert.Equal(h.T(), 400, actualRes.StatusCode)
+				resMap := h.parseResponseJson(actualRes)
+				assert.NotEmpty(h.T(), resMap["message"])
+
+				_, ok := resMap["message"].([]interface{})
+				assert.Equal(h.T(), ok, true)
+
+				errMsg := resMap["message"].([]interface{})[0]
+				assert.Equal(h.T(), errMsg, "invalid password. Min.6 Max.64")
+			},
+		},
 	}
 
 	for _, c := range cases {
