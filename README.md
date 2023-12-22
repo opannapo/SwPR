@@ -52,3 +52,13 @@ To run test, run the following command:
 ```
 make test
 ```
+
+
+# Result :
+Unittest Coverage 42%
+#
+![Screenshot from 2023-12-22 17-04-22](https://github.com/opannapo/SwPR/assets/18698574/b37421ee-ec15-4b05-a5d6-00f4e0447641)
+
+Postman Collection (dir /doc)
+#
+![Screenshot from 2023-12-22 17-06-54](https://github.com/opannapo/SwPR/assets/18698574/55df6f06-a2f9-4496-bc90-d1ee54be6fd6)
