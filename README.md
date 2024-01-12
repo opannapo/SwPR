@@ -1,3 +1,5 @@
+# OpenAPI Example
+
 ## Initiate The Project
 
 To start working, execute
